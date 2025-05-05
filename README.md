@@ -1,8 +1,10 @@
-# 🗪 Python Console Chat
+# Python Console Chat 🗪
 
 A multi-user console-based TCP chat written in Python. Supports concurrent client connections, message exchange, delivery confirmation, and error handling.
 
-## 🔗 Architecture
+> [Console Chat](https://raw.githubusercontent.com/nickAnhel/python-console-chat/refs/heads/main/pictures/image.png)
+
+# Architecture 🖇
 
 ```
 +-------------+       +-------------+       +-------------+
@@ -22,13 +24,13 @@ A multi-user console-based TCP chat written in Python. Supports concurrent clien
 - The server receives messages and broadcasts them to other connected clients
 - Uses `threading` to handle clients concurrently
 
-## 🛠 Technologies Used
+# Technologies 🛠
 
 - `python3.14`
 - `socket` — for TCP communication
 - `threading` — for handling multiple clients in parallel
 
-## 🚀 Running the Project
+# Running the Project 🚀
 
 Navigate to the `server` or `client` directory (depending on what you want to run) and execute the following sequence of commands using `uv`:
 
