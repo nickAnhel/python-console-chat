@@ -16,7 +16,6 @@ A multi-user console-based TCP chat written in Python. Supports concurrent clien
                       +-------------+
                       |  Client N   |
                       +-------------+
-
 ```
 
 - Each client connects to the server via TCP
