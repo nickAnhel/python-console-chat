@@ -2,7 +2,7 @@
 
 A multi-user console-based TCP chat written in Python. Supports concurrent client connections, message exchange, delivery confirmation, and error handling.
 
-> [Console Chat](https://raw.githubusercontent.com/nickAnhel/python-console-chat/refs/heads/master/pictures/image.png)
+![Console Chat](https://raw.githubusercontent.com/nickAnhel/python-console-chat/refs/heads/master/pictures/image.png)
 
 # Architecture 🖇
 
