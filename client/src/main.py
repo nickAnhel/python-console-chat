@@ -89,7 +89,7 @@ def client() -> None:
             if not message:
                 continue
 
-            if message.lower() in ("q", "quit", "e", "exit"):
+            if message.lower() in ("/q", "/quit", "/e", "/exit"):
                 break
 
             data = {
