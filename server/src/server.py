@@ -1,48 +1,48 @@
+import json
+import logging
 import socket
 import threading
 
-from src.config import SERVER_HOST, SERVER_PORT
+from src.config import settings
 
+logger = logging.getLogger("server." + __name__)
 
 CONNECTIONS: list[socket.socket] = []
 
 
-def handle_new_connection(connection: socket.socket, address: str) -> None:
+def handle_new_connection(connection: socket.socket, address: tuple[str, int]) -> None:
     while True:
         try:
             message = connection.recv(1024)
-            if message:
-                decoded = message.decode()
-                print(f"{address}: {decoded}")
-                try:
-                    broadcast(f"{address}: {decoded}", connection)
-                    connection.send("Message delivered successfully.".encode())
 
-                except Exception as e:
-                    connection.send(f"Failed to deliver message: {e}".encode())
-            else:
+            if not message:
                 disconnect(connection)
                 break
 
-        except ConnectionResetError:
-            disconnect(connection)
-            break
+            try:
+                data = json.loads(message.decode())
+                logger.info("New message from %r (%s:%s): %r", data["username"], address[0], address[1], data["text"])
+
+                broadcast(json.dumps(data), connection)
+
+                connection.send("Message delivered successfully.".encode())
+
+            except json.JSONDecodeError:
+                connection.send("Invalid message format.".encode())
 
         except Exception as e:
-            print(f"Error handling client {address}: {e}")
+            logger.error("Error handling client %s:%s %s", address[0], address[1], e)
             disconnect(connection)
             break
 
 
 def broadcast(message: str, sender_socket: socket.socket) -> None:
-    for conn in CONNECTIONS:
-        if conn != sender_socket:
+    for connection in CONNECTIONS:
+        if connection != sender_socket:
             try:
-                conn.send(message.encode())
-
-            except Exception as e:
-                print(f"Broadcast error: {e}")
-                disconnect(conn)
+                connection.send(message.encode())
+            except Exception:
+                disconnect(connection)
 
 
 def disconnect(connection: socket.socket) -> None:
@@ -59,23 +59,29 @@ def server() -> None:
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     try:
-        server_socket.bind((SERVER_HOST, SERVER_PORT))
+        server_socket.bind((settings.server.host, settings.server.port))
         server_socket.listen()
-
-        print(f"Server started on {SERVER_HOST}:{SERVER_PORT}")
+        logger.info(
+            "Server listening on %s:%s", settings.server.host, settings.server.port
+        )
 
         while True:
             connection, address = server_socket.accept()
             CONNECTIONS.append(connection)
+
+            logger.info("New connection from %s:%s", address[0], address[1])
+
             threading.Thread(
                 target=handle_new_connection, args=(connection, address), daemon=True
             ).start()
 
+    except KeyboardInterrupt:
+        logger.info("Exited with code 0")
+
     except Exception as e:
-        print(f"Server error: {e}")
+        logger.error("Server error: %s", e)
 
     finally:
-        for conn in CONNECTIONS:
-            disconnect(conn)
-
+        for connection in CONNECTIONS:
+            disconnect(connection)
         server_socket.close()
