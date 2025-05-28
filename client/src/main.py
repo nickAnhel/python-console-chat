@@ -94,7 +94,7 @@ def client() -> None:
 
             data = {
                 "username": username,
-                "timestamp": datetime.now().strftime("%H:%M:%S"),
+                "timestamp": datetime.now().strftime("%Y-%M-%d %H:%M:%S"),
                 "text": message,
             }
 
